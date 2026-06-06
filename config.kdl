@@ -1,0 +1,143 @@
+// --- Startup Applications ---
+spawn-at-startup "mako"
+spawn-at-startup "awww-daemon"
+spawn-at-startup "waybar"
+spawn-at-startup "sh" "-c" "dbus-update-activation-environment --all && systemctl --user stop xdg-desktop-portal xdg-desktop-portal-gnome xdg-desktop-portal-gtk && systemctl --user start xdg-desktop-portal"
+
+output "eDP-1" {
+    scale 1.3
+}
+
+// --- Layout & Appearance ---
+layout {
+    background-color "transparent"
+    gaps 0
+
+    border {
+        width 0
+    }
+
+    focus-ring {
+        width 1
+        active-color "#444444"
+        inactive-color "#222222"
+    }
+
+    struts {
+        left 0
+        right 0
+        top 0
+        bottom 0
+    }
+}
+
+// Set the overview "void" to transparent
+overview { 
+    backdrop-color "transparent" 
+}
+
+// Pin swww to the background layer
+layer-rule {
+    match namespace="^awww-daemon$"
+    place-within-backdrop true
+}
+
+// --- Input Settings ---
+input {
+    touchpad {
+        tap
+        click-method "button-areas"
+        drag-lock
+        accel-profile "adaptive"
+    }
+
+    mouse {
+        accel-profile "adaptive"
+    }
+
+    keyboard {
+        xkb {
+            layout "us"
+        }
+        repeat-delay 300
+        repeat-rate 40
+    }
+}
+
+// --- Keybinds ---
+binds {
+    // Super + Escape to zoom out
+    "Mod+Escape" { toggle-overview; }
+    
+    // Waybar Toggle
+    "Mod+Shift+W" { spawn "sh" "-c" "pgrep waybar >/dev/null && pkill waybar || waybar &"; }
+
+    // Terminal & File Managers
+    "Mod+Return" { spawn "alacritty"; }
+    "Mod+E"      { spawn "nautilus" "--new-window"; }
+
+    // Browsers
+    "Mod+B"  { spawn "chromium"; }
+    "Mod+Alt+B"      { spawn "brave"; }
+
+    // Window Management
+    "Mod+Q"      { close-window; }
+    "Mod+X"      { maximize-column; }
+    "Mod+F"      { fullscreen-window; }
+    "Mod+T"      { toggle-window-floating; }
+
+    // Navigation (Arrows + Vim keys)
+    "Mod+Left"   { focus-column-left; }
+    "Mod+Right"  { focus-column-right; }
+    "Mod+Up"     { focus-window-up; }
+    "Mod+Down"   { focus-window-down; }
+    "Mod+H"      { focus-column-left; }
+    "Mod+J"      { focus-window-down; }
+    "Mod+K"      { focus-window-up; }
+    "Mod+L"      { focus-column-right; }
+
+    // Utilities
+    "Mod+A"      { spawn "fuzzel"; }
+    "Mod+W"      { spawn "bash" "/home/haseeb/.config/niri/scripts/wallpaper-picker.sh"; }
+    "Mod+S"      { spawn "sh" "-c" "grim -g \"$(slurp)\" - | wl-copy"; }
+    "Mod+Shift+S" { spawn "sh" "-c" "grim -g \"$(slurp)\" - | magick - -colorspace Gray -sharpen 0x1 -contrast - | tesseract - - -l eng --psm 11 | wl-copy && notify-send 'OCR' 'Text copied to clipboard'"; }
+
+    // Move Columns/Windows
+    "Mod+Ctrl+Left"  { move-column-left; }
+    "Mod+Ctrl+Right" { move-column-right; }
+    "Mod+Ctrl+Up"    { move-window-up; }
+    "Mod+Ctrl+Down"  { move-window-down; }
+
+    // Workspace Switching
+    "Mod+1" { focus-workspace 1; }
+    "Mod+2" { focus-workspace 2; }
+    "Mod+3" { focus-workspace 3; }
+    "Mod+4" { focus-workspace 4; }
+    "Mod+5" { focus-workspace 5; }
+    "Mod+6" { focus-workspace 6; }
+    "Mod+7" { focus-workspace 7; }
+    "Mod+8" { focus-workspace 8; }
+    "Mod+9" { focus-workspace 9; }
+
+    // Move to Workspace
+    "Mod+Shift+1" { move-column-to-workspace 1; }
+    "Mod+Shift+2" { move-column-to-workspace 2; }
+    "Mod+Shift+3" { move-column-to-workspace 3; }
+    "Mod+Shift+4" { move-column-to-workspace 4; }
+    "Mod+Shift+5" { move-column-to-workspace 5; }
+    "Mod+Shift+6" { move-column-to-workspace 6; }
+    "Mod+Shift+7" { move-column-to-workspace 7; }
+    "Mod+Shift+8" { move-column-to-workspace 8; }
+    "Mod+Shift+9" { move-column-to-workspace 9; }
+
+    // Media & Brightness
+    "XF86AudioRaiseVolume" { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05+"; }
+    "XF86AudioLowerVolume" { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05-"; }
+    "XF86AudioMute"        { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    "XF86MonBrightnessUp"  { spawn "brightnessctl" "set" "+10%"; }
+    "XF86MonBrightnessDown"{ spawn "brightnessctl" "set" "5%-"; }
+
+    // Session Control
+    "Mod+Shift+E"     { quit; }
+    "Mod+Shift+L"     { spawn "gtklock" "-d" "-c" "ff69b4"; }
+}
